@@ -1,0 +1,25 @@
+{
+  "neural_model": "openai/clip-vit-base-patch32",
+  "similarity_threshold": 0.6,
+  "rules_file": "data/rules.json",
+  "device": "cuda",
+  "concepts": [
+    "cat",
+    "dog",
+    "bird",
+    "car",
+    "tree",
+    "building",
+    "person",
+    "pet"
+  ],
+  "logging": {
+    "level": "INFO",
+    "save_embeddings": true
+  },
+  "triton": {
+    "block_size_m": 16,
+    "block_size_n": 16,
+    "block_size_k": 16
+  }
+} 

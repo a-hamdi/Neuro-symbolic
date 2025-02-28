@@ -1,0 +1,14 @@
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.30.0
+triton>=2.0.0
+numpy>=1.23.0
+pillow>=9.0.0
+clip @ git+https://github.com/openai/CLIP.git
+networkx>=3.0
+rdflib>=6.0.0
+pydantic>=2.0.0
+tqdm>=4.65.0
+matplotlib>=3.7.0
+pytest>=7.0.0
+ipykernel>=6.0.0 
