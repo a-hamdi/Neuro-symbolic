@@ -1,0 +1,46 @@
+[
+  {
+    "name": "cat_is_pet",
+    "conditions": [
+      {
+        "subject": "detected_object",
+        "predicate": "is_a",
+        "object": "cat"
+      }
+    ],
+    "actions": [
+      {
+        "subject": "detected_object",
+        "predicate": "is_a",
+        "object": "pet"
+      },
+      {
+        "subject": "image",
+        "predicate": "contains",
+        "object": "pet"
+      }
+    ]
+  },
+  {
+    "name": "dog_is_pet",
+    "conditions": [
+      {
+        "subject": "detected_object",
+        "predicate": "is_a",
+        "object": "dog"
+      }
+    ],
+    "actions": [
+      {
+        "subject": "detected_object",
+        "predicate": "is_a",
+        "object": "pet"
+      },
+      {
+        "subject": "image",
+        "predicate": "contains",
+        "object": "pet"
+      }
+    ]
+  }
+]

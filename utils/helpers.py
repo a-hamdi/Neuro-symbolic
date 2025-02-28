@@ -34,8 +34,10 @@ def save_json(data: Dict[str, Any], file_path: str) -> None:
         data: Data to save
         file_path: Path to output file
     """
-    # Create directory if it doesn't exist
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    # Create directory if it doesn't exist and if there's a directory path
+    dirname = os.path.dirname(file_path)
+    if dirname:  # Only try to create directories if there's actually a directory path
+        os.makedirs(dirname, exist_ok=True)
     
     # Convert torch tensors to lists for JSON serialization
     serializable_data = {}
@@ -48,13 +50,14 @@ def save_json(data: Dict[str, Any], file_path: str) -> None:
         elif isinstance(item, dict):
             return {k: convert_tensor(v) for k, v in item.items()}
         elif isinstance(item, list):
-            return [convert_tensor(x) for x in item]
+            return [convert_tensor(i) for i in item]
         else:
             return item
     
+    # Convert data for JSON serialization
     serializable_data = convert_tensor(data)
     
-    # Save to file
+    # Write to file
     with open(file_path, 'w') as f:
         json.dump(serializable_data, f, indent=2)
 

@@ -3,6 +3,7 @@ import torch.nn as nn
 from typing import Dict, List, Any, Optional, Tuple, Union
 import sys
 import os
+import json
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from neural_perception.model import NeuralPerceptionModel
 from symbolic_reasoning.logic_engine import SymbolicReasoningEngine
 from triton_kernels.matrix_ops import triton_matmul, triton_cosine_similarity
+from utils.helpers import load_json
 
 
 class NeuroSymbolicFusion:
@@ -50,28 +52,50 @@ class NeuroSymbolicFusion:
         # Set threshold for similarity matching
         self.threshold = threshold
         
-        # Load concept embeddings (these would be pre-computed from a dataset in a real system)
-        self.concept_names = ["cat", "dog", "bird", "car", "tree", "building", "person", "pet"]
-        self.concept_embeddings = self._load_concept_embeddings()
+        # Load concept embeddings (pre-computed or generated)
+        self.concept_names, self.concept_embeddings = self._load_concept_embeddings()
         
-    def _load_concept_embeddings(self) -> torch.Tensor:
+    def _load_concept_embeddings(self) -> Tuple[List[str], torch.Tensor]:
         """
-        In a real system, we would load pre-computed embeddings for known concepts.
-        For this example, we'll create random embeddings.
+        Load pre-computed embeddings for known concepts.
+        If embeddings file doesn't exist, fall back to random embeddings.
         
         Returns:
-            Tensor of shape (num_concepts, embedding_dim)
+            Tuple of (concept_names, embeddings tensor)
         """
-        # Get embedding dimension from the neural model
+        embedding_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+                                      "data/concept_embeddings.json")
+        
+        # Try to load pre-computed embeddings
+        if os.path.exists(embedding_file):
+            try:
+                print(f"Loading concept embeddings from {embedding_file}")
+                embeddings_dict = load_json(embedding_file)
+                
+                # Get concept names and embeddings
+                concept_names = list(embeddings_dict.keys())
+                
+                # Convert embeddings to tensor
+                embedding_lists = [embeddings_dict[name] for name in concept_names]
+                embedding_dim = len(embedding_lists[0])
+                embeddings = torch.zeros(len(concept_names), embedding_dim, device=self.device)
+                
+                for i, emb_list in enumerate(embedding_lists):
+                    embeddings[i] = torch.tensor(emb_list, device=self.device)
+                
+                print(f"Loaded embeddings for {len(concept_names)} concepts")
+                return concept_names, embeddings
+            except Exception as e:
+                print(f"Error loading concept embeddings: {e}")
+        
+        # Fall back to random embeddings if loading fails
+        print("Using random concept embeddings (fallback)")
+        concept_names = ["cat", "dog", "bird", "car", "tree", "building", "person", "pet"]
         embedding_dim = self.neural_model.get_embedding_dimension()
-        
-        # Generate random embeddings
-        embeddings = torch.randn(len(self.concept_names), embedding_dim, device=self.device)
-        
-        # Normalize embeddings
+        embeddings = torch.randn(len(concept_names), embedding_dim, device=self.device)
         embeddings = embeddings / embeddings.norm(dim=1, keepdim=True)
         
-        return embeddings
+        return concept_names, embeddings
         
     def process(self, image_path: Optional[str] = None, 
                image: Optional[Any] = None,

@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import torch
 from typing import Dict, Any, Optional
 from PIL import Image
 
@@ -27,7 +28,6 @@ class NeuroSymbolicSystem:
         self.config = self._load_config(config_file)
         
         # Set device
-        import torch
         self.device = self.config.get('device', 'cuda' if torch.cuda.is_available() else 'cpu')
         
         # Initialize neural perception model
@@ -162,7 +162,6 @@ def main():
 if __name__ == "__main__":
     # Add a try-except block to handle errors gracefully
     try:
-        import torch
         main()
     except Exception as e:
         print(f"Error: {e}")
